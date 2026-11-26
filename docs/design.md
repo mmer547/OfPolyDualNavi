@@ -177,6 +177,11 @@ addLayersControls { relativeSizes false; firstLayerThickness ...; expansionRatio
 
 - **`relativeSizes false`（絶対値指定）を既定にする**。snappy の相対指定は hexRef8 の基準セル長が前提で、ポリヘドラルメッシュでは基準が不明確なため
 - y+ 計算機（U, L, ν, 目標 y+ → 第1層の厚さ）をGUIに入れる
+- **MRF界面にはレイヤーを入れない**（ユーザー要件）。GUI で次を保証する:
+  1. 界面（内部の faceZone）はレイヤー設定の対象に出さない。パッチ名の正規表現が界面に当たる場合はエラーにする
+  2. 壁からの縮小変位が界面まで届かないよう `nMedialAxisIter` を制限する
+  3. レイヤー追加後に、界面のずれと界面に接するセルの厚さを自動で検査し、基準を超えたら警告する
+- 壁とMRF領域を名前で取り違えないよう、パッチは `rotorCore` / `statorCore`、cellZone は `MRF_rotor` のように命名する
 - **MRF界面の変形対策**:
   - 制限なし: 界面のずれは R方向 最大3%、軸方向 最大8%
   - `nMedialAxisIter`: 2 / 4 / 8 / 16 で比較。**8 で界面のずれ1%以内、ハブ厚91%**。16 では制限なしとほぼ同じ
