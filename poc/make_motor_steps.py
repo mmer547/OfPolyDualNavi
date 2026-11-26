@@ -12,7 +12,7 @@
 """
 import argparse
 
-from netgen.occ import Cylinder, Pnt, Z
+from netgen.occ import Axis, Box, Cylinder, Pnt, Z
 
 ap = argparse.ArgumentParser()
 ap.add_argument("outdir")
@@ -20,6 +20,10 @@ ap.add_argument("--rotor-d", type=float, default=0.08)
 ap.add_argument("--gap", type=float, default=0.002)
 ap.add_argument("--stator-len", type=float, default=0.08)
 ap.add_argument("--rotor-len", type=float, default=None, help="省略時はステータと同じ")
+ap.add_argument("--slots", type=int, default=0, help="ステータ内径のスロット開口の数 (0 なら無し)")
+ap.add_argument("--slot-w", type=float, default=None, help="スロット開口の幅 (既定 2*gap)")
+ap.add_argument("--slot-d", type=float, default=None, help="スロット開口の深さ (既定 2*gap)")
+ap.add_argument("--mm", action="store_true", help="STEP を mm 単位で書く (実CADの模擬)")
 a = ap.parse_args()
 Rr = a.rotor_d / 2
 Rs = Rr + a.gap
@@ -32,6 +36,16 @@ parts = {
     "rotorCore": Cylinder(Pnt(0, 0, -Lr / 2), Z, r=Rr, h=Lr),
     "shaft": Cylinder(Pnt(0, 0, -Lh / 2), Z, r=0.25 * Rr, h=Lh),
 }
+if a.slots:
+    # スロット開口: ステータ内径から半径方向に切り込んだ溝 (底はステータ鉄心のまま)
+    w = a.slot_w or 2 * a.gap
+    d = a.slot_d or 2 * a.gap
+    for k in range(a.slots):
+        b = Box(Pnt(Rs - d, -w / 2, -Ls / 2), Pnt(Rs + d, w / 2, Ls / 2))
+        b = b.Rotate(Axis(Pnt(0, 0, 0), Z), 360.0 * k / a.slots)
+        parts["statorCore"] = parts["statorCore"] - b
 for n, s in parts.items():
+    if a.mm:
+        s = s.Scale(Pnt(0, 0, 0), 1000.0)
     s.WriteStep(f"{a.outdir}/{n}.step")
 print("written", list(parts))
