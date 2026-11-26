@@ -28,5 +28,7 @@
 | `make_motor_steps.py` | モータ風形状の部品 STEP を生成（シャフトが MRF 円筒を貫く） |
 | `occ_multidomain.py` | ルートA: 部品 STEP + MRF 円筒 → netgen.occ で界面一致の多領域テトラ |
 | `run_motor.sh` | モータ風形状での全工程（`./run_motor.sh <workdir> <MRF半径> [gap] [ギャップmaxh] [全体maxh]`） |
+| `occ_motor_gap.py` | ギャップ押し出し方式用: ギャップを除外し、両端の円環面を周期境界で同一分割にしたテトラ |
+| `run_motor_gap.sh` | ギャップ押し出し方式の全工程（AMI なし。`./run_motor_gap.sh <workdir> [円環maxh] [壁側maxh] [軸方向分割数] [全体maxh]`） |
 
-`run_motor.sh` は GNU time（`/usr/bin/time`）で各工程の時間と最大メモリも記録する。
+`run_motor.sh` / `run_motor_gap.sh` は GNU time（`/usr/bin/time`）で各工程の時間と最大メモリも記録する。
