@@ -1,7 +1,7 @@
 FoamFile { version 2.0; format ascii; class dictionary; object MRFProperties; }
 MRF1
 {
-    cellZone    rotor;
+    cellZone    MRF_rotor;
     active      yes;
     nonRotatingPatches ();
     origin      (0 0 0);

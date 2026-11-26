@@ -12,7 +12,7 @@ domin/domout で「どの領域とどの領域の間の面か」を指定して 
       --part walls.stl:0.03:1:0:walls \
       --part mrf.stl:0.012:2:1:mrfInterface \
       --part hub.stl:0.008:0:2:hub \
-      --zone 1:stator --zone 2:rotor --maxh 0.03
+      --zone 1:stator --zone 2:MRF_rotor --maxh 0.03
 
 制約: 各STLは閉じた多様体であること。MRF円筒が壁と交差/接触するケース
 (結合すると非多様体になる) は Netgen STL モジュールが失敗する (検証済)。

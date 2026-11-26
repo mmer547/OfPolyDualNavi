@@ -1,13 +1,13 @@
 """ルートA: 部品STEP + MRF円筒(解析形状) -> netgen.occ で界面一致の多領域テトラ
 
-流体 = 空洞 - 固体部品。MRF円筒で 流体を rotor/stator 領域に分け、Glue で
+流体 = 空洞 - 固体部品。MRF円筒で 流体を MRF_rotor/stator 領域に分け、Glue で
 界面を共有させる。パッチ名は部品名 (STEPファイル名) がそのまま引き継がれる。
 MRF円筒が壁と交差しても、交線は OCC が刻むので問題にならない。
 
 例:
-  python occ_multidomain.py out --cavity housing.step --solid stator.step --solid rotor.step \
+  python occ_multidomain.py out --cavity housing.step --solid statorCore.step --solid rotorCore.step \
      --solid shaft.step --mrf 0,0,-0.045:0,0,1:0.041:0.09 --maxh 0.008 \
-     --local-h rotor:0.0007 --local-h stator:0.0007 --local-h mrfInterface:0.0015
+     --local-h rotorCore:0.0007 --local-h statorCore:0.0007 --local-h mrfInterface:0.0015
 """
 import argparse
 import collections
@@ -46,7 +46,7 @@ def main():
     cyl.faces.name = "mrfInterface"
     rot = fluid * cyl
     sta = fluid - cyl
-    rot.mat("rotor"); sta.mat("stator")
+    rot.mat("MRF_rotor"); sta.mat("stator")
     shape = Glue([sta, rot])
     lh = dict(x.split(":") for x in a.local_h)
     for f in shape.faces:

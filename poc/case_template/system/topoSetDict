@@ -12,7 +12,7 @@ actions
         sourceInfo { p1 (0 0 -0.075); p2 (0 0 0.075); radius 0.1; }
     }
     {
-        name    rotor;
+        name    MRF_rotor;
         type    cellZoneSet;
         action  new;
         source  setToCellZone;

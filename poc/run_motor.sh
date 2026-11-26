@@ -13,9 +13,9 @@ cm(){ checkMesh > log.checkMesh.$1 2>&1; echo "  checkMesh($1): $(grep -E '^\s+c
 
 echo "=== STEP 作成 + netgen.occ (MRF R=$RM)"
 python "$HERE/make_motor_steps.py" . --gap "$GAP" >/dev/null
-T netgen python "$HERE/occ_multidomain.py" . --cavity housing.step --solid stator.step --solid rotor.step \
+T netgen python "$HERE/occ_multidomain.py" . --cavity housing.step --solid statorCore.step --solid rotorCore.step \
   --solid shaft.step --mrf "0,0,-0.045:0,0,1:$RM:0.09" --maxh "$H" \
-  --local-h rotor:$HG --local-h stator:$HG --local-h mrfInterface:$HG
+  --local-h rotorCore:$HG --local-h statorCore:$HG --local-h mrfInterface:$HG
 grep -E "^tets" log.netgen
 echo "=== OpenFOAM"
 T gmshToFoam gmshToFoam tet.msh
@@ -29,12 +29,12 @@ rm -f constant/polyMesh/*Zones
 sed -i "s/p1 (0 0 -0.075); p2 (0 0 0.075); radius 0.1;/p1 (0 0 -0.045); p2 (0 0 0.045); radius $RM;/" system/topoSetDict
 T topoSet topoSet; T createPatch createPatch -overwrite; rm -rf 0
 cm dual
-python "$HERE/foamreader.py" constant/polyMesh rotor 0 0 0 0 0 1 "$RM" 0.045
+python -W ignore "$HERE/foamreader.py" constant/polyMesh MRF_rotor 0 0 0 0 0 1 "$RM" 0.045 || echo "  (界面の計測に失敗)"
 cp -r constant/polyMesh polyMesh.dual
 python - <<'PY'
 import re
 s=open("system/snappyHexMeshDict").read()
-s=re.sub(r"layers\s*\{.*?\n    \}", 'layers\n    {\n        "(rotor|stator|shaft|housing)" { nSurfaceLayers 3; }\n    }', s, flags=re.S)
+s=re.sub(r"layers\s*\{.*?\n    \}", 'layers\n    {\n        "(rotorCore|statorCore|shaft|housing)" { nSurfaceLayers 3; }\n    }', s, flags=re.S)
 s=s.replace("firstLayerThickness 0.0015;","firstLayerThickness 0.0001;").replace("minThickness        0.0002;","minThickness        0.00002;")
 s=s.replace("locationInMesh (0.15 0.15 0.25);","locationInMesh (0 0.075 0.09);")
 open("system/snappyHexMeshDict","w").write(s)
@@ -43,5 +43,5 @@ T snappy snappyHexMesh -overwrite; rm -rf 0
 grep -A7 "overall thickness" log.snappy | tail -4
 cm final
 grep -E "\*\*\*" log.checkMesh.final || true
-grep -E "^\s+rotor\s+[0-9]+\s+[0-9]+\s+[0-9.e-]+" log.checkMesh.final
-python "$HERE/foamreader.py" constant/polyMesh rotor 0 0 0 0 0 1 "$RM" 0.045
+grep -E "^\s+MRF_rotor\s+[0-9]+\s+[0-9]+\s+[0-9.e-]+" log.checkMesh.final
+python -W ignore "$HERE/foamreader.py" constant/polyMesh MRF_rotor 0 0 0 0 0 1 "$RM" 0.045 || echo "  (界面の計測に失敗)"

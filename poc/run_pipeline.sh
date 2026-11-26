@@ -18,7 +18,7 @@ step "形状作成 + Netgen 多領域テトラ"
 python "$HERE/make_test_geometry.py" .
 python "$HERE/netgen_multidomain.py" . --maxh 0.03 \
     --part walls.stl:0.03:1:0:walls --part mrf.stl:0.012:2:1:mrfInterface --part hub.stl:0.008:0:2:hub \
-    --zone 1:stator --zone 2:rotor 2>&1 | grep -E "^tets"
+    --zone 1:stator --zone 2:MRF_rotor 2>&1 | grep -E "^tets"
 
 step "gmshToFoam (物理ボリューム->cellZone, 内部の物理サーフェス->faceZone)"
 gmshToFoam tet.msh > log.gmshToFoam 2>&1
@@ -40,14 +40,14 @@ rm -f constant/polyMesh/cellZones constant/polyMesh/faceZones constant/polyMesh/
 topoSet > log.topoSet 2>&1
 createPatch -overwrite > log.createPatch 2>&1; clean0
 checkMesh > log.checkMesh.dual 2>&1; grep -E "^\s+cells:|Mesh OK|Failed" log.checkMesh.dual
-python "$HERE/foamreader.py" constant/polyMesh rotor 0 0 0 0 0 1 0.1 0.075
+python -W ignore "$HERE/foamreader.py" constant/polyMesh MRF_rotor 0 0 0 0 0 1 0.1 0.075 || echo "  (界面の計測に失敗)"
 
 step "snappyHexMesh (addLayers のみ)"
 snappyHexMesh -overwrite > log.snappyHexMesh 2>&1; clean0
 grep -A6 "patch faces    layers   overall thickness" log.snappyHexMesh | tail -3
 checkMesh > log.checkMesh.final 2>&1; grep -E "^\s+cells:|Mesh OK|Failed" log.checkMesh.final
-grep -E "^\s+rotor\s+[0-9]" log.checkMesh.final
-python "$HERE/foamreader.py" constant/polyMesh rotor 0 0 0 0 0 1 0.1 0.075
+grep -E "^\s+MRF_rotor\s+[0-9]" log.checkMesh.final
+python -W ignore "$HERE/foamreader.py" constant/polyMesh MRF_rotor 0 0 0 0 0 1 0.1 0.075 || echo "  (界面の計測に失敗)"
 
 step "MRF simpleFoam (動作確認のみ)"
 cp -r "$HERE/case_template/0" .
