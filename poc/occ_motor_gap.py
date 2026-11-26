@@ -41,6 +41,8 @@ def main():
     ap.add_argument("--gap-edge-h", type=float, default=None, help="円環の壁側の円(ロータ外径/ステータ内径)の maxh")
     ap.add_argument("--grading", type=float, default=0.3)
     ap.add_argument("--local-h", action="append", default=[], help="patch:maxh")
+    ap.add_argument("--edge-h", action="append", default=[], help="patch:maxh  そのパッチの面の辺(特徴線)の maxh")
+    ap.add_argument("--optsteps3d", type=int, default=None, help="Netgen の体積メッシュ最適化回数")
     a = ap.parse_args()
 
     stem = lambda p: os.path.splitext(os.path.basename(p))[0]
@@ -95,8 +97,14 @@ def main():
     for f in shape.faces:
         if f.name in lh:
             f.maxh = float(lh[f.name])
+    eh = dict(x.split(":") for x in a.edge_h)
+    for f in shape.faces:
+        if f.name in eh:
+            for e in f.edges:
+                e.maxh = float(eh[f.name])
+    kw = {"optsteps3d": a.optsteps3d} if a.optsteps3d else {}
     t = time.time()
-    m = OCCGeometry(shape).GenerateMesh(maxh=a.maxh, grading=a.grading)
+    m = OCCGeometry(shape).GenerateMesh(maxh=a.maxh, grading=a.grading, **kw)
     print(f"netgen: {time.time()-t:.1f}s")
 
     tags, fd2tag = {}, {}
