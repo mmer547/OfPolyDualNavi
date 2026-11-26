@@ -1,0 +1,21 @@
+FoamFile { version 2.0; format ascii; class dictionary; object topoSetDict; }
+// polyDualMesh 後は cellZone の中身が無意味になる(セル番号のまま残る)ため作り直す。
+// 界面は円筒面に一致しているので、セル中心判定で曖昧さなく選べる。
+// (STL指定なら surfaceToCell / searchableSurfaceToCell でも可)
+actions
+(
+    {
+        name    rotorCells;
+        type    cellSet;
+        action  new;
+        source  cylinderToCell;
+        sourceInfo { p1 (0 0 -0.075); p2 (0 0 0.075); radius 0.1; }
+    }
+    {
+        name    rotor;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        sourceInfo { set rotorCells; }
+    }
+);

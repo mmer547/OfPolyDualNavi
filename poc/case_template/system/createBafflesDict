@@ -1,0 +1,17 @@
+FoamFile { version 2.0; format ascii; class dictionary; object createBafflesDict; }
+// MRF界面の faceZone を 両側パッチ(バッフル)に割る。
+// polyDualMesh で界面上の点を「境界点」として扱わせ、界面を円筒面に保つため。
+internalFacesOnly true;
+baffles
+{
+    mrf
+    {
+        type        faceZone;
+        zoneName    mrfInterface;
+        patches
+        {
+            master { name mrfStator; type patch; }
+            slave  { name mrfRotor;  type patch; }
+        }
+    }
+}

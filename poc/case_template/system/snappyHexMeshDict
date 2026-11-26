@@ -1,0 +1,47 @@
+FoamFile { version 2.0; format ascii; class dictionary; object snappyHexMeshDict; }
+// 既存のポリヘドラルメッシュにレイヤーだけを追加する設定
+castellatedMesh false;
+snap            false;
+addLayers       true;
+
+geometry {}
+
+// castellated/snap は使わないが辞書は必要
+castellatedMeshControls
+{
+    maxLocalCells 1000000; maxGlobalCells 10000000; minRefinementCells 0; maxLoadUnbalance 0.1;
+    nCellsBetweenLevels 1; features (); refinementSurfaces {}; resolveFeatureAngle 30;
+    refinementRegions {}; locationInMesh (0.15 0.15 0.25); allowFreeStandingZoneFaces true;
+}
+snapControls { nSmoothPatch 3; tolerance 2.0; nSolveIter 30; nRelaxIter 5; }
+
+addLayersControls
+{
+    relativeSizes       false;      // ポリメッシュでは相対指定の基準長が不明確なので絶対値
+    layers
+    {
+        walls { nSurfaceLayers 3; }
+        hub   { nSurfaceLayers 4; }
+    }
+    firstLayerThickness 0.0015;
+    expansionRatio      1.2;
+    minThickness        0.0002;
+    nGrow               0;
+    featureAngle        130;
+    slipFeatureAngle    30;
+    nRelaxIter          5;
+    nSmoothSurfaceNormals 1;
+    nSmoothNormals      3;
+    nSmoothThickness    10;
+    maxFaceThicknessRatio 0.5;
+    maxThicknessToMedialRatio 0.3;
+    minMedialAxisAngle  90;
+    nBufferCellsNoExtrude 0;
+    nLayerIter          50;
+    // 縮小変位を壁から何セルまで伝えるか。大きいとMRF界面が押されて変形する
+    // (検証: 制限なし→界面が最大3%R/軸方向8%変形, 8→1%以内でハブ厚91%確保)
+    nMedialAxisIter     8;
+}
+
+meshQualityControls { #include "meshQualityDict" }
+mergeTolerance 1e-6;

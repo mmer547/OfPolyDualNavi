@@ -1,0 +1,4 @@
+FoamFile { version 2.0; format ascii; class dictionary; object createPatchDict; }
+// 何も追加せず実行すると、空になったパッチ(mrfStator/mrfRotor/mrfInterface)が除去される
+pointSync false;
+patches ();
