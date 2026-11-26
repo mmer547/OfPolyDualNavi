@@ -24,4 +24,9 @@
 | `ng2msh.py` | Netgen → Gmsh 2.2（物理名付き、テトラの向き補正） |
 | `foamreader.py` | polyMesh リーダ、MRF界面のずれの評価 |
 | `case_template/` | 各工程の辞書（createBaffles / topoSet / snappy レイヤーのみ / MRFProperties など） |
-| `run_pipeline.sh` | 全工程の実行 |
+| `run_pipeline.sh` | 全工程の実行（MRF円筒が完全に内部のケース、STL入力） |
+| `make_motor_steps.py` | モータ風形状の部品 STEP を生成（シャフトが MRF 円筒を貫く） |
+| `occ_multidomain.py` | ルートA: 部品 STEP + MRF 円筒 → netgen.occ で界面一致の多領域テトラ |
+| `run_motor.sh` | モータ風形状での全工程（`./run_motor.sh <workdir> <MRF半径> [gap] [ギャップmaxh] [全体maxh]`） |
+
+`run_motor.sh` は GNU time（`/usr/bin/time`）で各工程の時間と最大メモリも記録する。

@@ -7,7 +7,9 @@
 """
 
 
-def write_msh22(mesh, path, patch_names, zone_names):
+def write_msh22(mesh, path, patch_names, zone_names, fd2tag=None):
+    """fd2tag: FaceDescriptor番号 -> 物理タグ (同名の面をまとめる場合)"""
+    fd2tag = fd2tag or {}
     P = mesh.Points()
     E2 = mesh.Elements2D()
     E3 = mesh.Elements3D()
@@ -26,7 +28,8 @@ def write_msh22(mesh, path, patch_names, zone_names):
         k = 0
         for e in E2:
             k += 1
-            f.write(f"{k} 2 2 {e.index} {e.index} " + " ".join(str(v.nr) for v in e.vertices) + "\n")
+            t = fd2tag.get(e.index, e.index)
+            f.write(f"{k} 2 2 {t} {t} " + " ".join(str(v.nr) for v in e.vertices) + "\n")
         for e in E3:
             v = [x.nr for x in e.vertices]
             v[0], v[1] = v[1], v[0]
