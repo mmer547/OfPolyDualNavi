@@ -16,7 +16,7 @@
 #   MRF_Z0 / MRF_Z1        MRF円筒の下端 / 上端 [m]
 #   (任意) MRF_R=ギャップ中央, ROTOR_NAME=rotorCore, STATOR_NAME=statorCore, RPM=0,
 #          DZ=軸方向刻み(既定 min(3*GAP, 重なり長/30)), HG=端面maxh(既定 GAP/4), HE=端面の辺maxh(既定 GAP/8), H=全体maxh, HC=コア面maxh,
-#          LAYERS=3, FIRST=第1層厚(既定 GAP/5), MEDIAL=8 (nMedialAxisIter)
+#          LAYERS=3, FIRST=第1層厚(既定 GAP/20), MEDIAL=8 (nMedialAxisIter)
 #   前提: モータ軸 = Z 軸 (原点を通る)。Z0..Z1 で押し出し領域の断面が一様 (スキューなし)
 #   例: CAVITY=~/motor/air.step SOLIDS="~/motor/statorCore.step ~/motor/rotorCore.step ~/motor/shaft.step" \
 #       SCALE=0.001 ROTOR_R=0.025 STATOR_R=0.0255 Z0=-0.03 Z1=0.03 EXT_R=0.028 MRF_Z0=-0.036 MRF_Z1=0.036 \
@@ -52,7 +52,7 @@ Rr=float("$ROTOR_R"); Rs=float("$STATOR_R"); g=Rs-Rr; z0=float("$Z0"); z1=float(
 DZ=float("${DZ:-0}") or min(g*3, (z1-z0)/30)
 d=dict(GAP=g, MRF_R=float("${MRF_R:-0}") or Rr+g/2, DZ=DZ, NZ=max(1,round((z1-z0)/DZ)), LC=z1-z0,
        HG=float("${HG:-0}") or g/4, HE=float("${HE:-0}") or g/8, H=float("${H:-0}") or Rr/4,
-       HC=float("${HC:-0}") or 4*g, FIRST=float("${FIRST:-0}") or g/5,
+       HC=float("${HC:-0}") or 4*g, FIRST=float("${FIRST:-0}") or g/20,
        MZC=(float("$MRF_Z0")+float("$MRF_Z1"))/2, MZH=(float("$MRF_Z1")-float("$MRF_Z0"))/2,
        ZE=DZ/4)
 for k,v in d.items(): print(f"{k}={v:.10g}")
